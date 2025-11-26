@@ -20,3 +20,8 @@ export(easy_predict_confidence)
 export(easy_summary)
 export(install_easyNNR_backend)
 export(install_easyNNR_tensorflow)
+
+export(save_easyNNR_model)
+export(load_easyNNR_model)
+export(start_training_session)
+export(end_training_session)
