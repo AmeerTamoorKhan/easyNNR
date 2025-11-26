@@ -2,7 +2,7 @@
 % Please edit documentation in R/save_model.R
 \name{save_easyNNR_model}
 \alias{save_easyNNR_model}
-\title{Save easyNNR Model with Results}
+\title{Save easyNNR Model and Results (architecture + weights + preprocessing)}
 \usage{
 save_easyNNR_model(
   model,
@@ -12,27 +12,6 @@ save_easyNNR_model(
   save_best = TRUE
 )
 }
-\arguments{
-\item{model}{An easyNNR model object}
-
-\item{output_dir}{Output directory path (will be created if doesn't exist)}
-
-\item{save_plots}{Logical, whether to save plots (default: TRUE)}
-
-\item{save_logs}{Logical, whether to save training logs (default: TRUE)}
-
-\item{save_best}{Logical, whether to save as "best" model with metrics in filename (default: TRUE)}
-}
-\value{
-Invisible list with paths to saved files
-}
 \description{
-Save a trained easyNNR model along with all results, plots, and logs
-to a structured output directory.
-}
-\examples{
-\dontrun{
-model <- easy_nn(iris, target = "Species")
-save_easyNNR_model(model, output_dir = "~/my_models")
-}
+Save easyNNR Model and Results (architecture + weights + preprocessing)
 }

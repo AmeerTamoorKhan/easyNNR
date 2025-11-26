@@ -2,21 +2,10 @@
 % Please edit documentation in R/save_model.R
 \name{load_easyNNR_model}
 \alias{load_easyNNR_model}
-\title{Load easyNNR Model}
+\title{Load a previously saved easyNNR model}
 \usage{
 load_easyNNR_model(path)
 }
-\arguments{
-\item{path}{Path to the saved model (.rds file)}
-}
-\value{
-An easyNNR model object
-}
 \description{
-Load a previously saved easyNNR model from an RDS file.
-}
-\examples{
-\dontrun{
-model <- load_easyNNR_model("~/my_models/models/latest_model.rds")
-}
+Load a previously saved easyNNR model
 }

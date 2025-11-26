@@ -4,7 +4,6 @@ S3method(plot,easyNNR)
 S3method(predict,easyNNR)
 S3method(print,easyNNR)
 S3method(summary,easyNNR)
-
 export(easy_compare)
 export(easy_dashboard)
 export(easy_nn)
@@ -19,14 +18,9 @@ export(easy_predict)
 export(easy_predict_batch)
 export(easy_predict_confidence)
 export(easy_summary)
-
+export(end_easyNNR_log)
 export(install_easyNNR_backend)
 export(install_easyNNR_tensorflow)
-
-# Save / Load System
-export(save_easyNNR_model)
 export(load_easyNNR_model)
-
-# Logging System (NEW)
+export(save_easyNNR_model)
 export(start_easyNNR_log)
-export(end_easyNNR_log)
