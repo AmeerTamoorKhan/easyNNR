@@ -1,0 +1,48 @@
+Package: easyNNR
+Type: Package
+Title: Easy Neural Networks for Regression and Classification with Advanced Preprocessing
+Version: 2.0.0
+Date: 2025-11-22
+Authors@R: c(
+    person("Your", "Name", email = "your.email@example.com", role = c("aut", "cre"))
+    )
+Description: A single-function solution for building, training, and evaluating 
+    neural networks in R with comprehensive preprocessing capabilities. Designed 
+    for beginners and researchers who want quick results without deep learning 
+    expertise. easyNNR handles preprocessing (outlier detection, target transformation,
+    class imbalance, feature selection, encoding, imputation, and more), model 
+    building, training, evaluation, and visualization automatically while still 
+    allowing advanced users to customize every aspect of the pipeline.
+    Compatible with TensorFlow 2.15.0 and Keras 2.15.0.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 4.0.0)
+Imports:
+    keras (>= 2.15.0),
+    tensorflow (>= 2.15.0),
+    dplyr (>= 1.0.0),
+    recipes (>= 1.0.0),
+    ggplot2 (>= 3.3.0),
+    tidyr (>= 1.0.0),
+    tibble (>= 3.0.0),
+    stats,
+    tools
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    patchwork,
+    bestNormalize
+RoxygenNote: 7.3.3
+VignetteBuilder: knitr
+URL: https://github.com/yourusername/easyNNR
+BugReports: https://github.com/yourusername/easyNNR/issues
+Collate:
+    'utils.R'
+    'preprocessing.R'
+    'easy_nn.R'
+    'predict.R'
+    'plot.R'
+    'print.R'

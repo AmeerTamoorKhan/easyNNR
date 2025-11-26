@@ -1,0 +1,577 @@
+setwd("/Users/ameertamoorkhan/easyNNR")#
+devtools::document()#
+devtools::install(build = TRUE, force = TRUE)
+#############################################################
+# 🧠 easyNNR Example: Regression (Possum Age Prediction) - FIXED#
+# Dataset: possum.csv#
+# Author: Ameer Tamoor Khan#
+#############################################################
+#
+# --- STEP 1️⃣: Load libraries ---------------------------------#
+library(easyNNR)#
+#
+# --- STEP 2️⃣: Load dataset -----------------------------------#
+data_path <- "/Users/ameertamoorkhan/Downloads/possum.csv"#
+#
+# Confirm file exists#
+if (!file.exists(data_path)) {#
+  stop("❌ File not found! Please check the path: ", data_path)#
+} else {#
+  cat("✅ File found at:", data_path, "\n")#
+}#
+#
+# Read CSV#
+possum <- read.csv(data_path, stringsAsFactors = TRUE)#
+cat("✅ Dataset loaded. Rows:", nrow(possum), " Columns:", ncol(possum), "\n")#
+#
+# Inspect data#
+cat("\n📊 First few rows:\n")#
+print(head(possum))#
+#
+cat("\n📊 Data structure:\n")#
+str(possum)#
+#
+cat("\n📊 Target variable summary:\n")#
+summary(possum$age)#
+#
+# Check for missing values#
+cat("\n📊 Missing values check:\n")#
+na_counts <- colSums(is.na(possum))#
+if (any(na_counts > 0)) {#
+  cat("Columns with NA values:\n")#
+  print(na_counts[na_counts > 0])#
+} else {#
+  cat("✅ No missing values found\n")#
+}#
+#
+# --- STEP 3️⃣: Define target and excluded columns --------------#
+target_col <- "age"#
+exclude_cols <- c("case")   # observation number (ID column)#
+#
+# --- STEP 4️⃣: Train the regression model ----------------------#
+#
+cat("\n🚀 Training regression model...\n")#
+cat("   Note: Using simpler architecture and no batch norm for small dataset\n\n")#
+#
+# SOLUTION 1: Disable scaling (safest for small datasets)#
+model_no_scale <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),          # Simpler architecture for small data#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,          # ⚠️ Turn off batch norm for small datasets#
+  optimizer = "adam",#
+  learning_rate = 0.001,#
+  epochs = 100,#
+  batch_size = 16,             # Smaller batch for small dataset#
+  validation_split = 0.2,#
+  scale_data = FALSE,          # ⚠️ Disable scaling (avoid NaN)#
+  verbose = TRUE#
+)#
+#
+cat("\n" , rep("=", 60), "\n", sep = "")#
+cat("SOLUTION 1 COMPLETE: No scaling\n")#
+cat(rep("=", 60), "\n\n", sep = "")#
+#
+# SOLUTION 2: With scaling (now fixed with zero-variance removal)#
+cat("\n🚀 Trying with scaling (fixed version)...\n\n")#
+#
+model_with_scale <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,#
+  optimizer = "adam",#
+  learning_rate = 0.001,#
+  epochs = 100,#
+  batch_size = 16,#
+  validation_split = 0.2,#
+  scale_data = TRUE,           # Now safe - zero variance cols removed#
+  verbose = TRUE#
+)#
+#
+cat("\n" , rep("=", 60), "\n", sep = "")#
+cat("SOLUTION 2 COMPLETE: With scaling (fixed)\n")#
+cat(rep("=", 60), "\n\n", sep = "")#
+#
+# Use the better performing model#
+model <- model_with_scale#
+#
+# --- STEP 5️⃣: Evaluate model ---------------------------------#
+cat("\n✅ Model training complete!\n\n")#
+print(model)#
+easy_summary(model)#
+#
+# --- STEP 6️⃣: Plot training/validation curves ----------------#
+cat("\n📊 Plotting training history...\n")#
+plot(model)#
+#
+# --- STEP 7️⃣: Make predictions -------------------------------#
+cat("\n🔮 Making predictions...\n")#
+#
+# IMPORTANT: Use the cleaned training data stored in the model#
+# The model was trained after removing NA rows, so we need to use that cleaned version#
+cleaned_data <- model$training_data#
+#
+cat("   Using cleaned training data (", nrow(cleaned_data), " rows)\n", sep = "")#
+sample_data <- cleaned_data[1:10, ]#
+#
+# Predict numeric age values#
+preds <- easy_predict(model, sample_data)#
+cat("\n🔢 Predicted vs Actual ages:\n")#
+comparison <- data.frame(#
+  Actual = sample_data$age,#
+  Predicted = round(preds, 1),#
+  Error = round(sample_data$age - preds, 1)#
+)#
+print(comparison)
+#############################################################
+# 🧠 easyNNR Example: Regression (Possum Age Prediction) - FIXED#
+# Dataset: possum.csv#
+# Author: Ameer Tamoor Khan#
+#############################################################
+#
+# --- STEP 1️⃣: Load libraries ---------------------------------#
+library(easyNNR)#
+#
+# --- STEP 2️⃣: Load dataset -----------------------------------#
+data_path <- "/Users/ameertamoorkhan/Downloads/possum.csv"#
+#
+# Confirm file exists#
+if (!file.exists(data_path)) {#
+  stop("❌ File not found! Please check the path: ", data_path)#
+} else {#
+  cat("✅ File found at:", data_path, "\n")#
+}#
+#
+# Read CSV#
+possum <- read.csv(data_path, stringsAsFactors = TRUE)#
+cat("✅ Dataset loaded. Rows:", nrow(possum), " Columns:", ncol(possum), "\n")#
+#
+# Inspect data#
+cat("\n📊 First few rows:\n")#
+print(head(possum))#
+#
+cat("\n📊 Data structure:\n")#
+str(possum)#
+#
+cat("\n📊 Target variable summary:\n")#
+summary(possum$age)#
+#
+# Check for missing values#
+cat("\n📊 Missing values check:\n")#
+na_counts <- colSums(is.na(possum))#
+if (any(na_counts > 0)) {#
+  cat("Columns with NA values:\n")#
+  print(na_counts[na_counts > 0])#
+} else {#
+  cat("✅ No missing values found\n")#
+}#
+#
+# --- STEP 3️⃣: Define target and excluded columns --------------#
+target_col <- "age"#
+exclude_cols <- c("case")   # observation number (ID column)#
+#
+# --- STEP 4️⃣: Train the regression model ----------------------#
+#
+cat("\n🚀 Training regression model...\n")#
+cat("   Note: Using simpler architecture and no batch norm for small dataset\n\n")#
+#
+# SOLUTION 1: Disable scaling (safest for small datasets)#
+model_no_scale <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),          # Simpler architecture for small data#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,          # ⚠️ Turn off batch norm for small datasets#
+  optimizer = "adam",#
+  learning_rate = 0.001,#
+  epochs = 100,#
+  batch_size = 16,             # Smaller batch for small dataset#
+  validation_split = 0.2,#
+  scale_data = FALSE,          # ⚠️ Disable scaling (avoid NaN)#
+  verbose = TRUE#
+)#
+#
+cat("\n" , rep("=", 60), "\n", sep = "")#
+cat("SOLUTION 1 COMPLETE: No scaling\n")#
+cat(rep("=", 60), "\n\n", sep = "")#
+#
+# SOLUTION 2: With scaling (now fixed with zero-variance removal)#
+cat("\n🚀 Trying with scaling (fixed version)...\n\n")#
+#
+model_with_scale <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,#
+  optimizer = "adam",#
+  learning_rate = 0.001,#
+  epochs = 100,#
+  batch_size = 16,#
+  validation_split = 0.2,#
+  scale_data = TRUE,           # Now safe - zero variance cols removed#
+  verbose = TRUE#
+)#
+#
+cat("\n" , rep("=", 60), "\n", sep = "")#
+cat("SOLUTION 2 COMPLETE: With scaling (fixed)\n")#
+cat(rep("=", 60), "\n\n", sep = "")#
+#
+# Use the better performing model#
+model <- model_with_scale#
+#
+# --- STEP 5️⃣: Evaluate model ---------------------------------#
+cat("\n✅ Model training complete!\n\n")#
+print(model)#
+easy_summary(model)#
+#
+# --- STEP 6️⃣: Plot training/validation curves ----------------#
+cat("\n📊 Plotting training history...\n")#
+plot(model)#
+#
+# --- STEP 7️⃣: Make predictions -------------------------------#
+cat("\n🔮 Making predictions...\n")#
+#
+# IMPORTANT: Use the cleaned training data stored in the model#
+# The model was trained after removing NA rows, so we need to use that cleaned version#
+cleaned_data <- model$training_data#
+#
+cat("   Using cleaned training data (", nrow(cleaned_data), " rows)\n", sep = "")#
+sample_data <- cleaned_data[1:10, ]#
+#
+# Predict numeric age values#
+preds <- easy_predict(model, sample_data)#
+# cat("\n🔢 Predicted vs Actual ages:\n")#
+# comparison <- data.frame(#
+  # Actual = sample_data$age,#
+  # Predicted = round(preds, 1),#
+  # Error = round(sample_data$age - preds, 1)#
+# )#
+# print(comparison)
+#############################################################
+# 🧠 easyNNR Example: Regression (Possum Age Prediction) - FIXED#
+# Dataset: possum.csv#
+# Author: Ameer Tamoor Khan#
+#############################################################
+#
+# --- STEP 1️⃣: Load libraries ---------------------------------#
+library(easyNNR)#
+#
+# --- STEP 2️⃣: Load dataset -----------------------------------#
+data_path <- "/Users/ameertamoorkhan/Downloads/possum.csv"#
+#
+# Confirm file exists#
+if (!file.exists(data_path)) {#
+  stop("❌ File not found! Please check the path: ", data_path)#
+} else {#
+  cat("✅ File found at:", data_path, "\n")#
+}#
+#
+# Read CSV#
+possum <- read.csv(data_path, stringsAsFactors = TRUE)#
+cat("✅ Dataset loaded. Rows:", nrow(possum), " Columns:", ncol(possum), "\n")#
+#
+# Inspect data#
+cat("\n📊 First few rows:\n")#
+print(head(possum))#
+#
+cat("\n📊 Data structure:\n")#
+str(possum)#
+#
+cat("\n📊 Target variable summary:\n")#
+summary(possum$age)#
+#
+# Check for missing values#
+cat("\n📊 Missing values check:\n")#
+na_counts <- colSums(is.na(possum))#
+if (any(na_counts > 0)) {#
+  cat("Columns with NA values:\n")#
+  print(na_counts[na_counts > 0])#
+} else {#
+  cat("✅ No missing values found\n")#
+}#
+#
+# --- STEP 3️⃣: Define target and excluded columns --------------#
+target_col <- "age"#
+exclude_cols <- c("case")   # observation number (ID column)#
+#
+# --- STEP 4️⃣: Train the regression model ----------------------#
+#
+cat("\n🚀 Training regression model...\n")#
+cat("   Note: Using simpler architecture and no batch norm for small dataset\n\n")#
+#
+# SOLUTION 1: Disable scaling (safest for small datasets)#
+model_no_scale <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),          # Simpler architecture for small data#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,          # ⚠️ Turn off batch norm for small datasets#
+  optimizer = "adam",#
+  learning_rate = 0.001,#
+  epochs = 100,#
+  batch_size = 16,             # Smaller batch for small dataset#
+  validation_split = 0.2,#
+  scale_data = FALSE,          # ⚠️ Disable scaling (avoid NaN)#
+  verbose = TRUE#
+)#
+#
+cat("\n" , rep("=", 60), "\n", sep = "")#
+cat("SOLUTION 1 COMPLETE: No scaling\n")#
+cat(rep("=", 60), "\n\n", sep = "")#
+#
+# SOLUTION 2: With scaling (now fixed with zero-variance removal)#
+cat("\n🚀 Trying with scaling (fixed version)...\n\n")#
+#
+model_with_scale <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,#
+  optimizer = "adam",#
+  learning_rate = 0.001,#
+  epochs = 100,#
+  batch_size = 16,#
+  validation_split = 0.2,#
+  scale_data = TRUE,           # Now safe - zero variance cols removed#
+  verbose = TRUE#
+)#
+#
+cat("\n" , rep("=", 60), "\n", sep = "")#
+cat("SOLUTION 2 COMPLETE: With scaling (fixed)\n")#
+cat(rep("=", 60), "\n\n", sep = "")#
+#
+# Use the better performing model#
+model <- model_with_scale#
+#
+# --- STEP 5️⃣: Evaluate model ---------------------------------#
+cat("\n✅ Model training complete!\n\n")#
+print(model)#
+easy_summary(model)#
+#
+# --- STEP 6️⃣: Plot training/validation curves ----------------#
+cat("\n📊 Plotting training history...\n")#
+plot(model)#
+#
+# --- STEP 7️⃣: Make predictions -------------------------------#
+cat("\n🔮 Making predictions...\n")#
+#
+# IMPORTANT: Use the cleaned training data stored in the model#
+# The model was trained after removing NA rows, so we need to use that cleaned version#
+cleaned_data <- model$training_data#
+#
+cat("   Using cleaned training data (", nrow(cleaned_data), " rows)\n", sep = "")#
+sample_data <- cleaned_data[1:10, ]#
+#
+# Predict numeric age values#
+preds <- easy_predict(model, sample_data)#
+cat("\n🔢 Predicted vs Actual ages:\n")#
+comparison <- data.frame(#
+  Actual = sample_data$age,#
+  Predicted = round(preds, 1),#
+  Error = round(sample_data$age - preds, 1)#
+)#
+print(comparison)
+#############################################################
+# 🧠 easyNNR Example: Regression (Possum Age Prediction)#
+# Dataset: possum.csv#
+# Author: Ameer Tamoor Khan#
+#############################################################
+#
+# --- 1️⃣ Load library -----------------------------------------#
+library(easyNNR)#
+#
+# --- 2️⃣ Load dataset -----------------------------------------#
+data_path <- "/Users/ameertamoorkhan/Downloads/possum.csv"#
+#
+if (!file.exists(data_path)) stop("❌ File not found!")#
+#
+possum <- read.csv(data_path, stringsAsFactors = TRUE)#
+cat("✅ Dataset loaded:", nrow(possum), "rows,", ncol(possum), "columns\n")#
+#
+# --- 3️⃣ Define target and excluded columns -------------------#
+target_col <- "age"#
+exclude_cols <- "case"   # ID column#
+#
+# --- 4️⃣ Train model ------------------------------------------#
+cat("\n🚀 Training model...\n")#
+#
+model <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,#
+  optimizer = "adam",#
+  epochs = 80,#
+  batch_size = 16,#
+  validation_split = 0.2,#
+  scale_data = TRUE#
+)#
+#
+# --- 5️⃣ Evaluate results -------------------------------------#
+cat("\n✅ Model training complete!\n")#
+easy_summary(model)#
+plot(model)#
+#
+# --- 6️⃣ Predict sample values --------------------------------#
+cat("\n🔮 Making predictions...\n")#
+sample_data <- possum[1:10, ]#
+preds <- easy_predict(model, sample_data)#
+#
+comparison <- data.frame(#
+  Actual = sample_data$age,#
+  Predicted = round(preds, 1),#
+  Error = round(sample_data$age - preds, 1)#
+)#
+#
+print(comparison)#
+cat("\n📈 Done — Possum age prediction complete!\n")
+#############################################################
+# 🧠 easyNNR Example: Regression (Possum Age Prediction)#
+# Dataset: possum.csv#
+# Author: Ameer Tamoor Khan#
+#############################################################
+#
+# --- 1️⃣ Load library -----------------------------------------#
+library(easyNNR)#
+#
+# --- 2️⃣ Load dataset -----------------------------------------#
+data_path <- "/Users/ameertamoorkhan/Downloads/possum.csv"#
+#
+if (!file.exists(data_path)) stop("❌ File not found!")#
+#
+possum <- read.csv(data_path, stringsAsFactors = TRUE)#
+cat("✅ Dataset loaded:", nrow(possum), "rows,", ncol(possum), "columns\n")#
+#
+# --- 3️⃣ Define target and excluded columns -------------------#
+target_col <- "age"#
+exclude_cols <- "case"   # ID column#
+#
+# --- 4️⃣ Train model ------------------------------------------#
+cat("\n🚀 Training model...\n")#
+#
+model <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,#
+  optimizer = "adam",#
+  epochs = 80,#
+  batch_size = 16,#
+  validation_split = 0.2,#
+  scale_data = TRUE#
+)#
+#
+# --- 5️⃣ Evaluate results -------------------------------------#
+cat("\n✅ Model training complete!\n")#
+easy_summary(model)#
+plot(model)#
+#
+# # --- 6️⃣ Predict sample values --------------------------------#
+# cat("\n🔮 Making predictions...\n")#
+# sample_data <- possum[1:10, ]#
+# preds <- easy_predict(model, sample_data)#
+#
+# comparison <- data.frame(#
+  # Actual = sample_data$age,#
+  # Predicted = round(preds, 1),#
+  # Error = round(sample_data$age - preds, 1)#
+# )#
+#
+# print(comparison)#
+# cat("\n📈 Done — Possum age prediction complete!\n")
+#############################################################
+# 🧠 easyNNR Example: Regression (Possum Age Prediction)#
+# Dataset: possum.csv#
+# Author: Ameer Tamoor Khan#
+#############################################################
+#
+# --- 1️⃣ Load library -----------------------------------------#
+library(easyNNR)#
+#
+# --- 2️⃣ Load dataset -----------------------------------------#
+data_path <- "/Users/ameertamoorkhan/Downloads/possum.csv"#
+#
+if (!file.exists(data_path)) stop("❌ File not found!")#
+#
+possum <- read.csv(data_path, stringsAsFactors = TRUE)#
+cat("✅ Dataset loaded:", nrow(possum), "rows,", ncol(possum), "columns\n")#
+#
+# --- 3️⃣ Define target and excluded columns -------------------#
+target_col <- "age"#
+exclude_cols <- "case"   # ID column#
+#
+# --- 4️⃣ Train model ------------------------------------------#
+cat("\n🚀 Training model...\n")#
+#
+model <- easy_nn(#
+  data = possum,#
+  target = target_col,#
+  exclude = exclude_cols,#
+  task = "regression",#
+  layers = c(64, 32),#
+  activations = c("relu", "relu"),#
+  dropout = c(0.2, 0.1),#
+  batch_norm = FALSE,#
+  optimizer = "adam",#
+  epochs = 80,#
+  batch_size = 16,#
+  validation_split = 0.2,#
+  scale_data = TRUE#
+)#
+#
+# --- 5️⃣ Evaluate results -------------------------------------#
+cat("\n✅ Model training complete!\n")#
+easy_summary(model)#
+plot(model)#
+#
+# --- 6️⃣ Predict sample values --------------------------------#
+cat("\n🔮 Making predictions...\n")#
+sample_data <- possum[1:10, ]#
+preds <- easy_predict(model, sample_data)#
+#
+# comparison <- data.frame(#
+  # Actual = sample_data$age,#
+  # Predicted = round(preds, 1),#
+  # Error = round(sample_data$age - preds, 1)#
+# )#
+#
+# print(comparison)#
+# cat("\n📈 Done — Possum age prediction complete!\n")
+# --- 6️⃣ Predict sample values --------------------------------#
+cat("\n🔮 Making predictions...\n")#
+sample_data <- possum[1:10, ]#
+preds <- easy_predict(model, sample_data)
+try(detach("package:easyNNR", unload = TRUE), silent = TRUE)#
+remove.packages("easyNNR")#
+system.file(package = "easyNNR")  # should return ""
