@@ -46,3 +46,5 @@ Collate:
     'predict.R'
     'plot.R'
     'print.R'
+    'save_model.R'
+
